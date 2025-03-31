@@ -3,6 +3,10 @@ import { headers } from 'next/headers';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { db } from '@/db/db';
 
+export const config = {
+  runtime: 'nodejs',
+};
+
 export async function POST(req: Request) {
   const SIGNING_SECRET = process.env.SIGNING_SECRET;
 
