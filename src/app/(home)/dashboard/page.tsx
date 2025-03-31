@@ -19,7 +19,7 @@ export default async function DashboardPage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/');
+    return redirect('/');
   }
 
   const posts = await db.post.findMany({
