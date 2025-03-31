@@ -1,26 +1,30 @@
 'use client';
-import { cn } from '@/lib/utils';
+
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ComponentProps, ReactNode } from 'react';
+import { Button } from './ui/button';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 
-export function Nav({ children }: { children: ReactNode }) {
+export function Nav() {
   return (
-    <nav className='bg-primary text-primary-foreground flex justify-center px-4'>
-      {children}
-    </nav>
-  );
-}
-
-export function NavLink(props: Omit<ComponentProps<typeof Link>, 'className'>) {
-  const pathname = usePathname();
-  return (
-    <Link
-      {...props}
-      className={cn(
-        'p-4 hover:bg-secondary hover:text-secondary-foreground focus-visible:bg-secondary focus-visible:text-secondary-foreground',
-        pathname === props.href && 'bg-background text-foreground'
-      )}
-    />
+    <header className='border-b'>
+      <div className='container mx-auto flex items-center justify-between px-4 h-16'>
+        <Link href='/' className='text-xl font-black'>
+          Blog
+        </Link>
+        <div className='flex items-center gap-4'>
+          <SignedIn>
+            <Link href='/dashboard'>
+              <Button variant='outline'>Dashboard</Button>
+            </Link>
+            <UserButton />
+          </SignedIn>
+          <SignedOut>
+            <SignInButton>
+              <Button>Sign In</Button>
+            </SignInButton>
+          </SignedOut>
+        </div>
+      </div>
+    </header>
   );
 }

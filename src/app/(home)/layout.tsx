@@ -1,4 +1,4 @@
-import { Nav, NavLink } from '@/components/Nav';
+import { Nav } from '@/components/Nav';
 import { ReactNode } from 'react';
 
 export default function HomeLayout({
@@ -6,10 +6,8 @@ export default function HomeLayout({
 }: Readonly<{ children: ReactNode }>) {
   return (
     <>
-      <Nav>
-        <NavLink href='/'>Home</NavLink>
-      </Nav>
-      <div className='container my-6'>{children}</div>
+      <Nav />
+      {children}
     </>
   );
 }
