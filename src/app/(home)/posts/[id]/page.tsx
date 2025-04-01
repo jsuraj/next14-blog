@@ -8,15 +8,28 @@ import { ArrowLeft, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+async function getPost(id: string) {
+  const post = await db.post.findUnique({
+    where: { id },
+    include: { author: true },
+  });
+
+  return post;
+}
+
+export async function generateStaticParams() {
+  const posts = await db.post.findMany({ select: { id: true } });
+  return posts.map((post) => ({ id: post.id }));
+}
+
+export const revalidate = 60;
+
 export default async function PostPage({
   params: { id },
 }: {
   params: { id: string };
 }) {
-  const post = await db.post.findUnique({
-    where: { id },
-    include: { author: true },
-  });
+  const post = await getPost(id);
 
   const { userId } = await auth();
   const isAuthor = post?.authorId === userId;
