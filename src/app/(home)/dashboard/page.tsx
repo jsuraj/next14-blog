@@ -58,7 +58,15 @@ export default async function DashboardPage() {
         <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
           {posts.map((post) => (
             <Link key={post.id} href={`/posts/${post.id}`}>
-              <Card className='h-full transition-all hover:shadow-md'>
+              <Card className='h-full transition-all hover:shadow-md overflow-hidden'>
+                {post.imageUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={post.imageUrl}
+                    alt={post.title}
+                    className='w-full h-48 object-cover'
+                  />
+                )}
                 <CardHeader>
                   <CardTitle>{post.title}</CardTitle>
                 </CardHeader>

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import PageContainer from '@/components/PageContainer';
 import RichTextEditor from '@/components/rich-text-editor';
 import { Button } from '@/components/ui/button';
@@ -64,6 +65,11 @@ export default async function PostPage({
             {formatDate(post.createdAt)}
           </time>
         </div>
+        {post.imageUrl && (
+          <div className='flex justify-center mb-6'>
+            <img src={post.imageUrl} alt='Post image' className='max-w-full' />
+          </div>
+        )}
         <RichTextEditor content={post.content} editable={false} />
       </article>
     </PageContainer>

@@ -14,6 +14,7 @@ export async function createPost(data: CreatePostInput) {
       data: {
         title: data.title,
         content: data.content,
+        imageUrl: data.imageUrl || null,
         authorId: userId,
       },
     });
@@ -36,6 +37,7 @@ export async function getPostForEdit(postId: string) {
         id: true,
         title: true,
         content: true,
+        imageUrl: true,
         authorId: true,
       },
     });
@@ -87,6 +89,7 @@ export async function editPost(postId: string, data: CreatePostInput) {
       data: {
         title: data.title,
         content: data.content,
+        imageUrl: data.imageUrl || undefined,
         updatedAt: new Date(),
       },
     });
@@ -94,5 +97,27 @@ export async function editPost(postId: string, data: CreatePostInput) {
   } catch (err) {
     console.error('Error updating post', err);
     return { success: false, message: 'Failed to update post' };
+  }
+}
+
+export async function uploadImage(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      return { success: true, url: data.url };
+    } else {
+      return { success: false };
+    }
+  } catch (error) {
+    console.error('Image upload failed', error);
+    return { success: false };
   }
 }

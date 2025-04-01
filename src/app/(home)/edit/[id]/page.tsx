@@ -22,6 +22,8 @@ export default function EditPostPage({
 
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
+  const [image, setImage] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { userId, isLoaded, isSignedIn } = useAuth();
@@ -36,6 +38,7 @@ export default function EditPostPage({
         if (post.success) {
           setTitle(post.data?.title ?? '');
           setContent(post.data?.content ?? '');
+          setImageUrl(post.data?.imageUrl ?? null);
         }
       } catch (err) {
         console.error('Failed to fetch post', err);
@@ -57,6 +60,13 @@ export default function EditPostPage({
     );
   }
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImage(file);
+    setImageUrl(URL.createObjectURL(file)); // Show preview before upload
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -64,7 +74,29 @@ export default function EditPostPage({
       if (!userId) {
         throw new Error('User is not authenticated');
       }
-      const result = await editPost(id, { title, content });
+
+      let uploadedImageUrl = imageUrl;
+
+      // Upload new image if selected
+      if (image) {
+        const formData = new FormData();
+        formData.append('file', image);
+
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error('Failed to upload image', data.err);
+        uploadedImageUrl = data.url;
+      }
+
+      const result = await editPost(id, {
+        title,
+        content,
+        imageUrl: uploadedImageUrl ?? undefined,
+      });
       if (result.success) {
         toast('Post updated successfully.');
         router.push(`/posts/${id}`);
@@ -104,6 +136,18 @@ export default function EditPostPage({
         <div className='space-y-2'>
           <Label htmlFor='content'>Content</Label>
           <RichTextEditor content={content} onChange={setContent} />
+        </div>
+        <div className='space-y-2'>
+          <Label htmlFor='image'>Post Image</Label>
+          {imageUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageUrl}
+              alt='Post Image'
+              className='w-full h-48 object-cover rounded-lg'
+            />
+          )}
+          <Input type='file' accept='image/*' onChange={handleImageChange} />
         </div>
         <Button type='submit' disabled={isSubmitting}>
           {isSubmitting ? 'Saving...' : 'Save Changes'}

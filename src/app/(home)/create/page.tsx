@@ -10,7 +10,7 @@ import { useAuth } from '@clerk/nextjs';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function CreatePage() {
@@ -18,6 +18,8 @@ export default function CreatePage() {
 
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
+  const [image, setImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { userId, isLoaded, isSignedIn } = useAuth();
 
@@ -31,6 +33,14 @@ export default function CreatePage() {
     return <div>Loading...</div>;
   }
 
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setImage(file);
+    if (file) {
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -38,7 +48,22 @@ export default function CreatePage() {
       if (!userId) {
         throw new Error('User is not authenticated');
       }
-      const result = await createPost({ title, content });
+      let imageUrl = null;
+
+      if (image) {
+        const formData = new FormData();
+        formData.append('file', image);
+
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error('Failed to upload image', data.err);
+        imageUrl = data.url;
+      }
+      const result = await createPost({ title, content, imageUrl });
       if (result.success) {
         toast('Post created successfully.');
         router.push('/');
@@ -78,6 +103,23 @@ export default function CreatePage() {
         <div className='space-y-2'>
           <Label htmlFor='content'>Content</Label>
           <RichTextEditor content={content} onChange={setContent} />
+        </div>
+        <div className='space-y-2'>
+          <Label htmlFor='image'>Upload Image</Label>
+          <Input
+            id='image'
+            type='file'
+            accept='image/*'
+            onChange={handleImageChange}
+          />
+          {previewUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={previewUrl}
+              alt='Preview'
+              className='w-40 h-40 object-cover mt-2'
+            />
+          )}
         </div>
         <Button type='submit' disabled={isSubmitting}>
           {isSubmitting ? 'Creating...' : 'Create Post'}
