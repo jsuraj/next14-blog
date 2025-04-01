@@ -11,6 +11,7 @@ export default async function Home() {
       author: true,
     },
   });
+  console.log('HomePage: posts length', posts.length);
 
   return (
     <PageContainer>
