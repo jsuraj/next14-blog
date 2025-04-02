@@ -14,6 +14,7 @@ import { EditIcon, PlusIcon } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
+import DeletePostButton from '@/components/DeletePostButton';
 
 export default async function DashboardPage() {
   const { userId } = await auth();
@@ -57,46 +58,48 @@ export default async function DashboardPage() {
       ) : (
         <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
           {posts.map((post) => (
-            <Link key={post.id} href={`/posts/${post.id}`}>
-              <Card className='h-full transition-all hover:shadow-md overflow-hidden'>
-                {post.imageUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={post.imageUrl}
-                    alt={post.title}
-                    className='w-full h-48 object-cover'
-                  />
-                )}
-                <CardHeader>
-                  <CardTitle>{post.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-muted-foreground line-clamp-2'>
-                    {DOMPurify.sanitize(post.content, { ALLOWED_TAGS: [] })}
-                  </div>
-                </CardContent>
-                <CardFooter className='flex justify-between'>
-                  <div className='text-sm text-muted-foreground'>
-                    <time dateTime={post.createdAt.toISOString()}>
-                      {formatDate(post.createdAt)}
-                    </time>
-                  </div>
-                  <div className='flex gap-2'>
-                    <Link href={`/posts/${post.id}`}>
-                      <Button variant='outline' size='sm'>
-                        View
-                      </Button>
-                    </Link>
-                    <Link href={`/edit/${post.id}`}>
-                      <Button variant='outline' size='sm'>
-                        <EditIcon className='mr-2 h-4 w-4' />
-                        Edit
-                      </Button>
-                    </Link>
-                  </div>
-                </CardFooter>
-              </Card>
-            </Link>
+            <Card
+              key={post.id}
+              className='h-full transition-all hover:shadow-md overflow-hidden'
+            >
+              {post.imageUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={post.imageUrl}
+                  alt={post.title}
+                  className='w-full h-48 object-cover'
+                />
+              )}
+              <CardHeader>
+                <CardTitle>{post.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className='text-muted-foreground line-clamp-2'>
+                  {DOMPurify.sanitize(post.content, { ALLOWED_TAGS: [] })}
+                </div>
+              </CardContent>
+              <CardFooter className='flex justify-between'>
+                <div className='text-sm text-muted-foreground'>
+                  <time dateTime={post.createdAt.toISOString()}>
+                    {formatDate(post.createdAt)}
+                  </time>
+                </div>
+                <div className='flex gap-2'>
+                  <Link href={`/posts/${post.id}`}>
+                    <Button variant='outline' size='sm'>
+                      View
+                    </Button>
+                  </Link>
+                  <Link href={`/edit/${post.id}`}>
+                    <Button variant='outline' size='sm'>
+                      <EditIcon className='mr-2 h-4 w-4' />
+                      Edit
+                    </Button>
+                  </Link>
+                  <DeletePostButton id={post.id} />
+                </div>
+              </CardFooter>
+            </Card>
           ))}
         </div>
       )}

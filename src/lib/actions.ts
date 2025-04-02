@@ -121,3 +121,37 @@ export async function uploadImage(file: File) {
     return { success: false };
   }
 }
+
+export async function deletePost(postId: string) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return { success: false, message: 'Unauthorized' };
+    }
+    const post = await db.post.findUnique({
+      where: { id: postId },
+      select: { authorId: true },
+    });
+
+    if (!post) {
+      return { success: false, message: 'Post not found' };
+    }
+
+    if (post.authorId !== userId) {
+      return {
+        success: false,
+        message: "You don't have permission to delete the post",
+      };
+    }
+
+    await db.post.delete({
+      where: {
+        id: postId,
+      },
+    });
+    return { success: true };
+  } catch (err) {
+    console.error('Error updating post', err);
+    return { success: false, message: 'Failed to delete post' };
+  }
+}
