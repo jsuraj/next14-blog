@@ -68,7 +68,7 @@ export default function CreatePage() {
       if (result.success) {
         toast('Post created successfully.');
         router.push('/');
-        revalidatePath('/')
+        revalidatePath('/');
       } else {
         toast('Failed to create post.');
       }
@@ -100,6 +100,17 @@ export default function CreatePage() {
             placeholder='Enter post title'
             className='bg-slate-50'
             required
+            onKeyDown={(e) => {
+              if (e.key === 'Tab') {
+                e.preventDefault();
+                const editorDiv = document.querySelector(
+                  '#content-editor div'
+                ) as HTMLElement;
+                if (editorDiv) {
+                  editorDiv.focus();
+                }
+              }
+            }}
           />
         </div>
         <div className='space-y-2'>

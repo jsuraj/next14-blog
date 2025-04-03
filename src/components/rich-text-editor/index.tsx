@@ -58,7 +58,16 @@ export default function RichTextEditor({
   return (
     <div>
       {isEditable && <MenuBar editor={editor} />}
-      <EditorContent editor={editor} />
+      <EditorContent
+        editor={editor}
+        id='content-editor'
+        onKeyDown={(e) => {
+          if (e.shiftKey && e.key === 'Tab') {
+            e.preventDefault();
+            document.getElementById('title')?.focus();
+          }
+        }}
+      />
     </div>
   );
 }

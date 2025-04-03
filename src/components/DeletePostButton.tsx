@@ -33,7 +33,7 @@ export default function DeletePostButton({ id }: DeletePostButtonProps) {
     try {
       const result = await deletePost(id);
       if (result.success) {
-        toast('Post delete successfully');
+        toast('Post deleted successfully');
         router.refresh();
       } else {
         throw new Error('Something went wrong');
