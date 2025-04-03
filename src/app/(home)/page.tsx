@@ -2,6 +2,8 @@ import BlogList from '@/components/BlogList';
 import PageContainer from '@/components/PageContainer';
 import { db } from '@/db/db';
 
+export const revalidate = 0;
+
 export default async function Home() {
   const posts = await db.post.findMany({
     orderBy: {

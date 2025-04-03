@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { createPost } from '@/lib/actions';
 import { useAuth } from '@clerk/nextjs';
 import { ArrowLeft } from 'lucide-react';
+import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
@@ -67,6 +68,7 @@ export default function CreatePage() {
       if (result.success) {
         toast('Post created successfully.');
         router.push('/');
+        revalidatePath('/')
       } else {
         toast('Failed to create post.');
       }
